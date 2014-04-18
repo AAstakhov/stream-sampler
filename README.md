@@ -1,0 +1,4 @@
+StreamSampling
+==============
+
+Test task: StreamSampling
