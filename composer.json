@@ -1,0 +1,14 @@
+{
+	"description": "Test task application for ResearchGate, Implements a stream sampler that picks a random (representative) sample of size k from a stream of values with unknown and possibly very large length.",
+	"require": {
+		"symfony/class-loader": "*",
+		"symfony/console": "*",
+		"symfony/stopwatch": "*",
+		"symfony/config": "*",
+		"symfony/yaml": "*"
+	},
+
+	"autoload": {
+		"psr-0": { "": ["src/"] }
+	}
+}

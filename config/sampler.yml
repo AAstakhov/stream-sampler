@@ -1,0 +1,36 @@
+config:
+    inputs:
+        ansi_text:
+          kind: Text
+          description: 'Predefined ANSI text'
+          use_utf8: false
+          parameters:
+            text: 'THEQUICKBROWNFOXJUMPSOVERTHELAZYDOG'
+        utf_text:
+          kind: Text
+          description: 'Predefined UTF8 text'
+          use_utf8: true
+          parameters:
+            text: 'БыстраяКоричневаяЛисаПрыгаетЧерезЛенивогоПса'
+        random:
+          kind: Random
+          description: 'Random stream'
+          use_utf8: false
+          parameters:
+            read_count: 1000
+        random_org:
+          kind: RandomOrg
+          use_utf8: false
+          description: 'Data from random.org'
+        ansi_file:
+          kind: File
+          use_utf8: false
+          description: 'Data from file (ANSI)'
+          parameters:
+            path: 'docs\Question_Stream_Sampling_Three_Sources.pdf'
+        utf_file:
+          kind: File
+          use_utf8: true
+          description: 'Data from file (UTF)'
+          parameters:
+            path: 'src/ResearchGate/StreamSampling/Tests/res/utf8_text.txt'
