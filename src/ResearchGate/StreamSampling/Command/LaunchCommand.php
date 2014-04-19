@@ -2,7 +2,6 @@
 
 namespace ResearchGate\StreamSampling\Command;
 
-
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -41,8 +40,8 @@ class LaunchCommand extends Command
 
     protected function execute( InputInterface $input, OutputInterface $output )
     {
-        $inputInfo = $this->getInputDataKindFromUser( $output );
-        $sampleSize = $this->getSampleSizeFromUser( $output );
+        $inputInfo  = $this->askInputDataKind( $output );
+        $sampleSize = $this->askSampleSize( $output );
 
         $stream = StreamBuilder::getStream( $inputInfo );
 
@@ -59,7 +58,7 @@ class LaunchCommand extends Command
      *
      * @return array
      */
-    private function getInputDataKindFromUser( OutputInterface $output )
+    private function askInputDataKind( OutputInterface $output )
     {
         $dialog             = $this->getHelperSet()->get( 'dialog' );
         $possibleInputKinds = array_values(
@@ -83,9 +82,9 @@ class LaunchCommand extends Command
         return $this->configuration['inputs'][$inputKind];
     }
 
-    private function getSampleSizeFromUser( OutputInterface $output )
+    private function askSampleSize( OutputInterface $output )
     {
-        $dialog = $this->getHelperSet()->get('dialog');
+        $dialog = $this->getHelperSet()->get( 'dialog' );
 
         return (integer)$dialog->ask(
             $output,
@@ -110,7 +109,7 @@ class LaunchCommand extends Command
         );
     }
 
-    private function doBeforeWork( $sampler, OutputInterface $output )
+    private function doBeforeWork( StreamSampler $sampler, OutputInterface $output )
     {
         $this->stopwatch->start( 'Sampler' );
         $stopwatch = $this->stopwatch;
@@ -126,7 +125,8 @@ class LaunchCommand extends Command
     }
 
     /**
-     * Ouputs the report data
+     * Outputs the report data
+     *
      * @param                 $sample
      * @param OutputInterface $output
      */
@@ -134,31 +134,39 @@ class LaunchCommand extends Command
     {
         $event = $this->stopwatch->stop( 'Sampler' );
         $output->writeln( '' );
-        $output->writeln( $sample );
         $output->writeln( '' );
-        $output->writeln( 'Memory: ' . $event->getMemory() / 1024 . ' MB' );
-        $output->writeln( 'Time: ' . $event->getDuration() / 1000 / 60 . ' min' );
+        $output->writeln( 'Found sample: ' . $sample );
+        $output->writeln( '' );
+        $output->writeln( 'Report' );
+        $table = $this->getHelperSet()->get( 'table' );
+        $table
+        ->setHeaders( array( 'Param', 'Value' ) )
+        ->setRows(
+                array(
+                     array( 'Used memory', sprintf('%d MB', $event->getMemory() / 1024 ) ),
+                     array( 'Duration', sprintf('%.1f min', $event->getDuration() / 1000 / 60 ) )
+                )
+            );
+        $table->render( $output );
     }
 
 
     /**
      * Outputs progress information on the same place on the screen
+     *
      * @param OutputInterface $output
-     * @param string $message
+     * @param string          $message
      */
     private function overwrite( OutputInterface $output, $message )
     {
         $length = StringHelper::length( $message, true );
         if (null !== $this->lastMessagesLength && $this->lastMessagesLength > $length) {
-            $message = StringHelper::padString( $message, $this->lastMessagesLength, "\x20"  );
+            $message = StringHelper::padString( $message, $this->lastMessagesLength, "\x20" );
         }
         $output->write( "\x0D" );
         $output->write( $message );
 
         $this->lastMessagesLength = StringHelper::length( $message, true );
     }
-
-
-
 
 }

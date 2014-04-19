@@ -10,7 +10,13 @@ use ResearchGate\StreamSampling\Input;
  */
 class StreamBuilder
 {
-
+    /**
+     * Builds a stream depending on configuration data.
+     *
+     * @param Array $inputInfo
+     *
+     * @return Stream
+     */
     public static function getStream( $inputInfo )
     {
         $kind       = $inputInfo['kind'];

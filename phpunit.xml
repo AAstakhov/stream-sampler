@@ -11,7 +11,7 @@
 		>
 	<testsuites>
 		<testsuite name="App Tests">
-			<directory>src/ResearchGate/Tests</directory>
+			<directory>src/ResearchGate/StreamSampling/Tests</directory>
 		</testsuite>
 	</testsuites>
 </phpunit>

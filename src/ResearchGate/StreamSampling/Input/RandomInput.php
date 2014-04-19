@@ -2,19 +2,24 @@
 
 namespace ResearchGate\StreamSampling\Input;
 
+use ResearchGate\StreamSampling\StreamWrapper\RandomStreamWrapper;
+
 class RandomInput implements InputInterface
 {
     private $length;
 
-    public function __construct($length)
+    public function __construct( $length )
     {
         $this->length = (int)$length;
-        stream_wrapper_register('random', 'ResearchGate\StreamSampling\StreamWrapper\RandomStreamWrapper');
+
+        if (!in_array( 'random', stream_get_wrappers() )) {
+            stream_wrapper_register( RandomStreamWrapper::PROTOCOL, 'ResearchGate\StreamSampling\StreamWrapper\RandomStreamWrapper' );
+        }
     }
 
 
     public function getResourcePath()
     {
-        return 'random://' . $this->length;
+        return RandomStreamWrapper::PROTOCOL . '://' . $this->length;
     }
 }

@@ -2,15 +2,20 @@
 
 namespace ResearchGate\StreamSampling\StreamWrapper;
 
+/**
+ * Custom stream wrapper to generate random data.
+ */
 class RandomStreamWrapper
 {
     private $position;
     private $length;
 
+    const PROTOCOL = 'random';
+
     function stream_open( $path, $mode, $options, &$opened_path )
     {
         $this->position = 0;
-        $this->length   = (int)str_replace( 'random://', '', $path );
+        $this->length   = (int)str_replace( self::PROTOCOL . '://', '', $path );
         return true;
     }
 
@@ -46,6 +51,5 @@ class RandomStreamWrapper
         return false;
     }
 }
-
 
 ?>

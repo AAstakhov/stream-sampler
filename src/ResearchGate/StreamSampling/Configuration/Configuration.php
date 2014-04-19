@@ -13,29 +13,24 @@ class Configuration implements ConfigurationInterface
         $rootNode    = $treeBuilder->root( 'config' );
 
         $rootNode
-        ->children()
-        ->arrayNode('inputs')
-        ->isRequired()
-        ->requiresAtLeastOneElement()
+            ->children()
+                ->arrayNode( 'inputs' )
+                ->isRequired()
+                ->requiresAtLeastOneElement()
+                ->prototype('array')
+                    ->children()
+                        ->scalarNode('kind')->isRequired()->end()
+                        ->scalarNode('description')->isRequired()->end()
+                        ->booleanNode('use_utf8')->isRequired()->end()
+                        ->arrayNode('parameters')
+                            ->useAttributeAsKey('name')
+                            ->prototype('scalar')
+                        ->end()
 
-        ->prototype('array')
-        ->children()
-
-        ->scalarNode('kind')->isRequired()->end()
-        ->scalarNode('description')->isRequired()->end()
-        ->booleanNode('use_utf8')->isRequired()->end()
-
-        ->arrayNode('parameters')
-        ->useAttributeAsKey('name')
-        ->prototype('scalar')
-        //->children()
-        ->end()
-
-        ->end()
-        ->end()
-        ->end()
-        ->end()
-        ;
+                    ->end()
+                ->end()
+            ->end()
+        ->end();
 
         return $treeBuilder;
     }

@@ -26,7 +26,7 @@ class SampleInfo
     public static function getFullDescription( $sampleData, $reserveData, $length )
     {
         return sprintf(
-            "%.0f | %s - (%s) | %d",
+            "Iteration: %.0f | Sample: %s | Symbol positions: %s | Reserve size: %d",
             $length,
             implode( '', $sampleData ),
             implode( ' ', array_keys( $sampleData ) ),

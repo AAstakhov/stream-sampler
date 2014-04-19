@@ -33,13 +33,13 @@ class Stream
      */
     private $useUtf;
 
-    public function __construct( InputInterface $input, $useUtf8 )
+    public function __construct( InputInterface $input, $useUtf )
     {
         $this->handle = fopen( $input->getResourcePath(), 'rb' );
         $this->input  = $input;
-        $this->useUtf = $useUtf8;
+        $this->useUtf = $useUtf;
 
-        $this->reader = $useUtf8 ? new Reader\UtfStreamReader() :
+        $this->reader = $useUtf ? new Reader\UtfStreamReader() :
             new Reader\EasyStreamReader();
 
     }

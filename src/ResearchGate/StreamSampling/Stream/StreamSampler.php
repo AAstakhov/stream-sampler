@@ -9,8 +9,9 @@ use ResearchGate\StreamSampling\Helper\StringHelper;
  */
 class StreamSampler
 {
+
     /**
-     * Current length of data read from a stream.
+     * Current length of data was read from a stream.
      * @var int
      */
     private $length;
@@ -50,12 +51,16 @@ class StreamSampler
 
     /**
      * Data portion to be read on the first fetch.
+     *
+     * Both FIRST_FETCH_SIZE and FETCH_SIZE are definitely big in order to work with long and short streams.
      */
     const FIRST_FETCH_SIZE = 500000;
     /**
      * Data portion to be read on each fetch.
      */
     const FETCH_SIZE       = 100000;
+
+    const PROGRESS_NOTIFICATION_INTERVAL = 100;
 
 
     /**
@@ -81,8 +86,8 @@ class StreamSampler
             $newSampleSymbols = $this->getNewSampleSymbols( $size, $this->length, $portion );
 
             // Save sample symbols from the previous sample
-            $replaceableItems  = $this->getReplaceableSampleSymbols( $this->sampleSymbols, $newSampleSymbols );
-            $this->reserveSymbols = array_merge( $this->reserveSymbols, $replaceableItems );
+            $replaceableSymbols  = $this->getReplaceableSampleSymbols( $this->sampleSymbols, $newSampleSymbols );
+            $this->reserveSymbols = array_merge( $this->reserveSymbols, $replaceableSymbols );
 
             $this->sampleSymbols = $newSampleSymbols;
             $this->length = $this->length + StringHelper::length( $portion, $this->useUtf );
@@ -110,7 +115,7 @@ class StreamSampler
      *
      * @return array
      */
-    private function getNewSampleSymbols( $size, $oldLength, $newPortion )
+    protected function getNewSampleSymbols( $size, $oldLength, $newPortion )
     {
         $newLength      = (float)( $oldLength + StringHelper::length( $newPortion, $this->useUtf ) );
         $intervalLength = (float)( $newLength / $size );
@@ -174,7 +179,7 @@ class StreamSampler
      *
      * @return string
      */
-    public function rereadStreamToFindLostSymbols( Stream $stream )
+    protected function rereadStreamToFindLostSymbols( Stream $stream )
     {
         $stream->restart();
         $length = 0;
@@ -194,7 +199,7 @@ class StreamSampler
      *
      * @return array
      */
-    private function getReplaceableSampleSymbols( $oldData, $newData )
+    protected function getReplaceableSampleSymbols( $oldData, $newData )
     {
         return array_diff_key( $oldData, $newData );
     }
@@ -226,7 +231,7 @@ class StreamSampler
 
     protected function doOnProgress( $iteration )
     {
-        if ($iteration % 1000 == 1) {
+        if ($iteration % self::PROGRESS_NOTIFICATION_INTERVAL == 1) {
             if ($this->onProgress) {
                 call_user_func_array(
                     $this->onProgress,

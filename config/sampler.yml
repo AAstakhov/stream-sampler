@@ -27,7 +27,7 @@ config:
           use_utf8: false
           description: 'Data from file (ANSI)'
           parameters:
-            path: 'docs\Question_Stream_Sampling_Three_Sources.pdf'
+            path: 'docs/Question_Stream_Sampling_Three_Sources.pdf'
         utf_file:
           kind: File
           use_utf8: true
