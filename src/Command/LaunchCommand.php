@@ -48,7 +48,7 @@ class LaunchCommand extends Command
         $sampler = new StreamSampler();
         $this->doBeforeWork( $sampler, $output );
         $sample = $sampler->getSample( $sampleSize, $stream );
-        $this->doAfterWork( $sample, $output );
+        $this->doAfterWork( $sampler, $sample, $output );
 
 
     }
@@ -127,12 +127,20 @@ class LaunchCommand extends Command
     /**
      * Outputs the report data
      *
+     * @param StreamSampler   $sampler
      * @param                 $sample
      * @param OutputInterface $output
      */
-    private function doAfterWork( $sample, OutputInterface $output )
+    private function doAfterWork( StreamSampler $sampler, $sample, OutputInterface $output )
     {
         $event = $this->stopwatch->stop( 'Sampler' );
+        $report =                 [
+            [ 'Max memory usage', sprintf( '%d MB', $event->getMemory() / 1024 ) ],
+            [ 'Duration', sprintf( '%.1f min', $event->getDuration() / 1000 / 60 ) ],
+        ];
+
+        $report = array_merge($report, $sampler->getStatistics());
+
         $output->writeln( '' );
         $output->writeln( '' );
         $output->writeln( 'Found sample: ' . $sample );
@@ -140,13 +148,8 @@ class LaunchCommand extends Command
         $output->writeln( 'Report' );
         $table = $this->getHelperSet()->get( 'table' );
         $table
-        ->setHeaders( array( 'Param', 'Value' ) )
-        ->setRows(
-                array(
-                     array( 'Used memory', sprintf('%d MB', $event->getMemory() / 1024 ) ),
-                     array( 'Duration', sprintf('%.1f min', $event->getDuration() / 1000 / 60 ) )
-                )
-            );
+        //->setHeaders( [ 'Param', 'Value' ] )
+        ->setRows( $report );
         $table->render( $output );
     }
 

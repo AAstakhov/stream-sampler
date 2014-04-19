@@ -12,9 +12,9 @@ class StreamSampler
 
     /**
      * Current length of data was read from a stream.
-     * @var int
+     * @var float
      */
-    private $length;
+    private $length = 0.0;
 
     /**
      * Sample symbols that are calculated on a current step of reading a new portion from a stream.
@@ -50,6 +50,12 @@ class StreamSampler
     private $hasToRereadStream = false;
 
     /**
+     * Count of reserved symbols used in picking a sample.
+     * @var int
+     */
+    private $usedReservedSymbolCount = 0;
+
+    /**
      * Data portion to be read on the first fetch.
      *
      * Both FIRST_FETCH_SIZE and FETCH_SIZE are definitely big in order to work with long and short streams.
@@ -58,7 +64,7 @@ class StreamSampler
     /**
      * Data portion to be read on each fetch.
      */
-    const FETCH_SIZE       = 100000;
+    const FETCH_SIZE = 100000;
 
     const PROGRESS_NOTIFICATION_INTERVAL = 100;
 
@@ -81,16 +87,16 @@ class StreamSampler
 
             $fetchSize = $iteration == 0 ? self::FIRST_FETCH_SIZE : self::FETCH_SIZE;
 
-            $portion       = $stream->get( $fetchSize );
+            $portion = $stream->get( $fetchSize );
             // Calculate new sample using new portion of data
             $newSampleSymbols = $this->getNewSampleSymbols( $size, $this->length, $portion );
 
             // Save sample symbols from the previous sample
-            $replaceableSymbols  = $this->getReplaceableSampleSymbols( $this->sampleSymbols, $newSampleSymbols );
+            $replaceableSymbols   = $this->getReplaceableSampleSymbols( $this->sampleSymbols, $newSampleSymbols );
             $this->reserveSymbols = array_merge( $this->reserveSymbols, $replaceableSymbols );
 
             $this->sampleSymbols = $newSampleSymbols;
-            $this->length = $this->length + StringHelper::length( $portion, $this->useUtf );
+            $this->length        = $this->length + StringHelper::length( $portion, $this->useUtf );
 
             // Notify about reading progress
             $this->doOnProgress( $iteration++ );
@@ -110,8 +116,8 @@ class StreamSampler
      * Finds new sample symbols for new portion of data from the stream.
      *
      * @param integer $size
-     * @param float $oldLength
-     * @param float $newPortion
+     * @param float   $oldLength
+     * @param float   $newPortion
      *
      * @return array
      */
@@ -120,7 +126,7 @@ class StreamSampler
         $newLength      = (float)( $oldLength + StringHelper::length( $newPortion, $this->useUtf ) );
         $intervalLength = (float)( $newLength / $size );
 
-        $newSampleData = [ ];
+        $newSampleSymbols = [ ];
 
         for ($i = 0; $i < $size; $i++) {
 
@@ -134,46 +140,48 @@ class StreamSampler
 
             if ($symbolPosition) {
                 // If sample symbol is found, leave it in the sample.
-                $newSampleData[$symbolPosition] = $this->sampleSymbols[$symbolPosition];
+                $newSampleSymbols[$symbolPosition] = $this->sampleSymbols[$symbolPosition];
             } else {
 
                 // Border situation: old stream length lays in the new interval
                 if ($this->isNumberInInterval( $oldLength, $intervalStart, $intervalFinish )) {
-                    $symbol                                 = StringHelper::getRandomSymbolInText(
+                    $symbol                                    = StringHelper::getRandomSymbolInText(
                         $newPortion,
                         0,
                         $intervalFinish - $oldLength,
                         $this->useUtf
                     );
-                    $newSampleData[$symbol[1] + $oldLength] = $symbol[0];
+                    $newSampleSymbols[$symbol[1] + $oldLength] = $symbol[0];
                 } elseif ($intervalStart > $oldLength) {
                     // Old length lays before new interval
-                    $symbol                                 = StringHelper::getRandomSymbolInText(
+                    $symbol                                    = StringHelper::getRandomSymbolInText(
                         $newPortion,
                         $intervalStart - $oldLength,
                         $intervalFinish - $oldLength,
                         $this->useUtf
                     );
-                    $newSampleData[$symbol[1] + $oldLength] = $symbol[0];
+                    $newSampleSymbols[$symbol[1] + $oldLength] = $symbol[0];
                 } else {
                     // Symbol is lost. Try to find it in reserve symbol list.
                     $symbolPosition = SampleInfo::getSymbolPosition( $this->reserveSymbols, $intervalStart, $intervalFinish );
                     if ($symbolPosition) {
-                        $newSampleData[$symbolPosition] = $this->reserveSymbols[$symbolPosition];
+                        $newSampleSymbols[$symbolPosition] = $this->reserveSymbols[$symbolPosition];
+                        $this->usedReservedSymbolCount++;
                     } else {
                         // Symbol is utterly lost. Set flah to reread stream on the second stage.
-                        $newSampleData[$intervalStart] = '';
-                        $this->hasToRereadStream       = true;
+                        $newSampleSymbols[$intervalStart] = '';
+                        $this->hasToRereadStream          = true;
                     }
                 }
             }
         }
 
-        return $newSampleData;
+        return $newSampleSymbols;
     }
 
     /**
      * Reread stream to find lost symbols
+     *
      * @param Stream $stream
      * @param        $item
      *
@@ -194,6 +202,7 @@ class StreamSampler
 
     /**
      * Compares to symbol arrays and finds which symbols are gone from the sample.
+     *
      * @param array $oldData
      * @param array $newData
      *
@@ -213,14 +222,25 @@ class StreamSampler
 
     /**
      * Initialization before reading the stream
+     *
      * @param Stream $stream
      */
     private function doBeforeGetSample( Stream $stream )
     {
-        $this->useUtf = $stream->isUtf8();
-        $this->length = 0.0;
+        $this->useUtf                  = $stream->isUtf8();
+        $this->length                  = 0.0;
+        $this->usedReservedSymbolCount = 0;
         settype( $this->length, 'float' );
         $this->hasToRereadStream = false;
+    }
+
+    public function getStatistics()
+    {
+        return [
+            [ 'Reserved symbols', count($this->reserveSymbols) ],
+            [ 'Reserved symbols used', $this->usedReservedSymbolCount ],
+            [ 'Stage 2 used', var_export($this->hasToRereadStream, true) ]
+        ];
     }
 
 
