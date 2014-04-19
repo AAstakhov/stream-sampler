@@ -33,4 +33,4 @@ config:
           use_utf8: true
           description: 'Data from file (UTF)'
           parameters:
-            path: 'src/ResearchGate/StreamSampling/Tests/res/utf8_text.txt'
+            path: 'src/Tests/res/utf8_text.txt'

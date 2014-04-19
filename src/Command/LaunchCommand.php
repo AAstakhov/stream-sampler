@@ -96,7 +96,7 @@ class LaunchCommand extends Command
 
     private function loadConfiguration()
     {
-        $directories   = array( __DIR__ . '/../../../../config' );
+        $directories   = array( __DIR__ . '/../../config' );
         $locator       = new FileLocator( $directories );
         $loader        = new YmlConfigurationLoader( $locator );
         $configValues  = $loader->load( $locator->locate( 'sampler.yml' ) );

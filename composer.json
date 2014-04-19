@@ -1,5 +1,6 @@
 {
 	"description": "Test task application for ResearchGate, Implements a stream sampler that picks a random (representative) sample of size k from a stream of values with unknown and possibly very large length.",
+	"type": "project",
 
 	"authors": [
 		{
@@ -16,6 +17,6 @@
 	},
 
 	"autoload": {
-		"psr-0": { "": ["src/"] }
+		"psr-4": { "ResearchGate\\StreamSampling\\": ["src/"] }
 	}
 }

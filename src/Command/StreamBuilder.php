@@ -34,7 +34,7 @@ class StreamBuilder
                 $input = new Input\RandomOrgInput();
                 break;
             case 'File':
-                $input = new Input\FileInput( __DIR__ . '/../../../../' . $parameters['path'] );
+                $input = new Input\FileInput( __DIR__ . '/../../' . $parameters['path'] );
                 break;
         }
 
