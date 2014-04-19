@@ -1,11 +1,18 @@
 {
 	"description": "Test task application for ResearchGate, Implements a stream sampler that picks a random (representative) sample of size k from a stream of values with unknown and possibly very large length.",
+
+	"authors": [
+		{
+			"name": "Andrey Astakhov",
+			"email": "andrey.astakhov@gmail.com"
+		}
+	],
+
 	"require": {
-		"symfony/class-loader": "*",
-		"symfony/console": "*",
-		"symfony/stopwatch": "*",
-		"symfony/config": "*",
-		"symfony/yaml": "*"
+		"symfony/console": "v2.4.3",
+		"symfony/stopwatch": "v2.4.3",
+		"symfony/config": "v2.4.3",
+		"symfony/yaml": "v2.4.3"
 	},
 
 	"autoload": {

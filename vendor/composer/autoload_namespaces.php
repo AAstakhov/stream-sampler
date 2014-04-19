@@ -11,6 +11,5 @@ return array(
     'Symfony\\Component\\Filesystem\\' => array($vendorDir . '/symfony/filesystem'),
     'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
     'Symfony\\Component\\Config\\' => array($vendorDir . '/symfony/config'),
-    'Symfony\\Component\\ClassLoader\\' => array($vendorDir . '/symfony/class-loader'),
     '' => array($baseDir . '/src'),
 );
