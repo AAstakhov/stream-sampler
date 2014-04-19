@@ -18,6 +18,6 @@ Supported kinds of input data:
 
 
 ### TODO
-1. Refine report in console application.
+1. <del>Refine report in console application.</del>
 2. Test reading from big files drawing charts.
 3. Improve UTF8 reading.
