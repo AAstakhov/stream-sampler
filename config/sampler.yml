@@ -22,6 +22,9 @@ config:
           kind: RandomOrg
           use_utf8: false
           description: 'Data from random.org'
+          parameters:
+            string_count: 1000
+            string_length: 20
         ansi_file:
           kind: File
           use_utf8: false

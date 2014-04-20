@@ -31,7 +31,7 @@ class StreamBuilder
                 $input = new Input\RandomInput( $parameters['read_count'] );
                 break;
             case 'RandomOrg':
-                $input = new Input\RandomOrgInput();
+                $input = new Input\RandomOrgInput( $parameters['string_count'], $parameters['string_length'] );
                 break;
             case 'File':
                 $input = new Input\FileInput( __DIR__ . '/../../' . $parameters['path'] );
