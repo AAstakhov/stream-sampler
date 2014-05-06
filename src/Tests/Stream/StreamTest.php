@@ -36,9 +36,16 @@ class StreamTest extends \PHPUnit_Framework_TestCase
     {
         $input  = new Input\FileInput( __DIR__ . '/../res/utf8_text.txt' );
         $stream = new Stream( $input, true );
-        $stream->get(50); // Pass first paragraph
-        $textInFile = $stream->get(16);
-        $this->assertEquals($textInFile, 'Социальные медиа');
+        $stream->get( 50 ); // Pass first paragraph
+        $textInFile = $stream->get( 16 );
+        $this->assertEquals( $textInFile, 'Социальные медиа' );
+    }
+
+    public function testNonExistingFileInput()
+    {
+        $this->setExpectedException( 'Exception' );
+        $input  = new Input\FileInput( 'this file does not exist' );
+        $stream = new Stream( $input, false );
     }
 
 }
