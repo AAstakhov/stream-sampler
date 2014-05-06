@@ -14,6 +14,6 @@ class FileInput implements InputInterface
 
     public function getResourcePath()
     {
-        return $this->path . 'dddd';
+        return $this->path;
     }
 }
