@@ -36,6 +36,11 @@ class Stream
     public function __construct( InputInterface $input, $useUtf )
     {
         $this->handle = fopen( $input->getResourcePath(), 'rb' );
+        if( $this->handle === false)
+        {
+            throw new \Exception(sprintf('Stream resource is wrong.'));
+        }
+
         $this->input  = $input;
         $this->useUtf = $useUtf;
 
